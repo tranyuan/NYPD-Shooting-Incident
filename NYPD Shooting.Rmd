@@ -1,0 +1,52 @@
+---
+title: "NYPD Shooting Report"
+author: "TranYuan Chen"
+date: "2023-05-22"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About Data 
+
+List of every shooting incident that occurred in NYC going back to 2006 through the end of the previous calendar year.
+
+This is a breakdown of every shooting incident that occurred in NYC going back to 2006 through the end of the previous calendar year. This data is manually extracted every quarter and reviewed by the Office of Management Analysis and Planning before being posted on the NYPD website. Each record represents a shooting incident in NYC and includes information about the event, the location and time of occurrence. In addition, information related to suspect and victim demographics are also included. This data can be used by the public to explore the nature of shooting/criminal activity. Please refer to the attached data footnotes for additional information about this dataset.
+
+## Read Data
+```{r prepare data}
+library(tidyverse)
+df = read_csv("https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD")
+head(df)
+```
+After reading the data, the columns that are interest to me are Boro, Vic_age_group, vic_sex and vic_race
+
+## Including Plots
+
+```{r Incides in Boros, echo=FALSE}
+df %>% ggplot(aes(x=BORO)) + geom_bar()+theme(legend.position = "bottom") + labs(title = "Incides in different Boroughs", y= NULL)
+```
+
+\n Brooklyn has the highest incidents. 
+
+```{r races, echo=FALSE}
+df %>% ggplot(aes(x=VIC_RACE)) + geom_bar()+theme(legend.position = "bottom", axis.text.x = element_text(angle = 90)) + labs(title = "Incides in different Races", y= NULL)
+
+```
+\n
+
+
+\n Black victim has the highest incidents.
+
+## Including Model
+```{r fit model}
+mod <- lm(STATISTICAL_MURDER_FLAG~ BORO + VIC_AGE_GROUP + VIC_SEX + VIC_RACE, data = df)
+summary(mod)
+```
+
+## Indentify Bias
+There are some bias that the race of victim are black because we don't have the population detail in each races. It may be caused by certain of area has more incidents than any other area. It's better to test and validate the assumption in data rather than just looking at the portion of data.
